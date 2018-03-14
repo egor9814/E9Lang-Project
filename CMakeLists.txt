@@ -10,3 +10,6 @@ set(PARSER_SOURCE_FILES
         E9Lang/lang/parser/util.cpp E9Lang/lang/parser/util.hpp
         )
 add_library(e9parser SHARED ${PARSER_SOURCE_FILES})
+
+add_executable(lexer_test tests/lexer_test.cpp)
+target_link_libraries(lexer_test e9parser)
