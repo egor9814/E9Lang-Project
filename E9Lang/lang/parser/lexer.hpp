@@ -16,18 +16,13 @@ namespace e9lang {
 
         struct LexerConfig {
             int tabWidth;
-            bool skipWS;
-            bool skipEOL;
             bool skipComments;
 
             std::string operatorsChars;
             std::map<std::string, e9lang::parser::TokenType> operators;
             std::map<std::string, e9lang::parser::TokenType> keywords;
 
-            LexerConfig(int tabWidth = 4,
-                        bool skipWS = true,
-                        bool skipEOL = true,
-                        bool skipComments = true);
+            LexerConfig(int tabWidth = 4, bool skipComments = true);
         };
 
 

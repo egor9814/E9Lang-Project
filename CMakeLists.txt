@@ -8,6 +8,7 @@ set(PARSER_SOURCE_FILES
         E9Lang/lang/parser/lexer.cpp E9Lang/lang/parser/lexer.hpp
         E9Lang/lang/parser/tokens.hpp
         E9Lang/lang/parser/util.cpp E9Lang/lang/parser/util.hpp
+        E9Lang/lang/parser/tokentypes.hpp
         )
 add_library(e9parser SHARED ${PARSER_SOURCE_FILES})
 

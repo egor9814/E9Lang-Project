@@ -1,0 +1,36 @@
+
+fun main(){
+    if true and true
+        print "it's work!"
+    else
+        print "something wrong!"
+
+    var c = '0', uc = 250UC,
+        s = 65000S, us = 65000US,
+        i = 32000000, ui = 32000000
+        l = 3L, ul = 4UL
+        f = 3.14F, d = 2.7
+        b = true,
+        str = "hello!"
+
+    print "char: ${c}, unsigned: ${uc}"
+    print "short: ${s}, unsigned: ${ui}"
+    print "int: ${i}, unsigned: ${ui}"
+    print "long: ${l}, unsigned: ${ul}"
+    print "float: ${f}, double: ${d}"
+    print "bool: ${b}\nstring: ${str}"
+
+    print variable_not_found
+
+    const Pi = 3.14
+    Pi = 3.1415
+
+    var a, b
+    a = 50 b = 2
+    print a + b
+    print a - b
+    print a * b
+    print a / b
+    print a ** b
+    print a % b
+}

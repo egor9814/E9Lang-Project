@@ -5,8 +5,8 @@
 #include "lexer.hpp"
 #include "util.hpp"
 
-e9lang::parser::LexerConfig::LexerConfig(int tabWidth, bool skipWS, bool skipEOL, bool skipComments)
-        : tabWidth(tabWidth), skipWS(skipWS), skipEOL(skipEOL), skipComments(skipComments),
+e9lang::parser::LexerConfig::LexerConfig(int tabWidth, bool skipComments)
+        : tabWidth(tabWidth), skipComments(skipComments),
           operatorsChars("[]{}(),.;:<>?!~@%^&*/-+=|") {
     operators["."] = e9lang::parser::TokenType_DOT;
     operators[","] = e9lang::parser::TokenType_COMMA;
@@ -82,7 +82,8 @@ e9lang::parser::LexerConfig::LexerConfig(int tabWidth, bool skipWS, bool skipEOL
 }
 
 
-e9lang::parser::FileSourceProvider::FileSourceProvider(const std::string &fileName) : fileName(fileName) {}
+e9lang::parser::FileSourceProvider::FileSourceProvider(const std::string &fileName)
+        : fileName(fileName) {}
 
 bool e9lang::parser::FileSourceProvider::open() {
     if (input.is_open())
@@ -186,7 +187,6 @@ void e9lang::parser::Lexer::tokenizeNumber() {
         if (current == 'u' || current == 'U') {
             unsigned_ = true;
             current = next();
-            continue;
         } else if (current == 'c' || current == 'C') {
             if (typed && error.empty()) {
                 error = "multitype not supported";
@@ -253,6 +253,14 @@ void e9lang::parser::Lexer::tokenizeNumber() {
             buffer += current;
             current = next();
         } else if (current == '_') {
+            current = next();
+        } else if (current == '.'){
+            if(buffer.find('.') != std::string::npos && error.empty()){
+                error = "invalid double number";
+            } else {
+                buffer += current;
+                type = TokenType_DOUBLE;
+            }
             current = next();
         } else {
             break;
@@ -442,7 +450,7 @@ void e9lang::parser::Lexer::tokenizeComment(bool multiline) {
     char current = peek();
     if (multiline) {
         //bool eof = false;
-        while (current != '*' && peek(1) != '/') {
+        while (current != '*' || peek(1) != '/') {
             if (current == 0) {
                 error = "unexpected end of file";
                 //eof = true;
@@ -485,34 +493,20 @@ char e9lang::parser::Lexer::peek(unsigned long relPos) {
 
 char e9lang::parser::Lexer::next() {
     pos++;
-    auto state = save();
     char current = peek();
     if (current == '\r') {
         if (peek(1) == '\n') {
-            if (!cfg.skipEOL)
-                addToken(TokenType_EOL_WIN, "\\r\\n", state);
             pos++;
             current = peek();
-        } else {
-            if (!cfg.skipEOL)
-                addToken(TokenType_EOL_MAC, "\\r", state);
         }
         col = 1;
         row++;
     } else if (current == '\n') {
-        if (!cfg.skipEOL)
-            addToken(TokenType_EOL_LIN, "\\n", state);
         col = 1;
         row++;
     } else if (current == '\t') {
-        if (!cfg.skipWS)
-            addToken(TokenType_TAB, "\\t", state);
         col += cfg.tabWidth;
     } else {
-        if (current == ' ') {
-            if (!cfg.skipWS)
-                addToken(TokenType_SPACE, "' '", state);
-        }
         col++;
     }
     return current;

@@ -5,14 +5,15 @@
 #include <iostream>
 #include "../E9Lang/lang/parser/lexer.hpp"
 
+#define USE_TEST(number) "../tests/test" #number ".enl"
 int main(){
     using namespace e9lang::parser;
-    FileSourceProvider sourceProvider("tests/test1.enl");
+    FileSourceProvider sourceProvider(USE_TEST(1));
     if(!sourceProvider.open()){
         std::cerr << "cannot open input file" << std::endl;
         return -1;
     }
-    LexerConfig config/*(4, false, false, false)*/;
+    LexerConfig config(4, false);
     Lexer lexer(config, sourceProvider);
     sourceProvider.close();
 
