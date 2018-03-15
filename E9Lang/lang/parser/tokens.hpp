@@ -7,7 +7,6 @@
 
 #include <string>
 #include <sstream>
-#include <map>
 #include "tokentypes.hpp"
 
 namespace e9lang {

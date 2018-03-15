@@ -9,8 +9,21 @@ set(PARSER_SOURCE_FILES
         E9Lang/lang/parser/tokens.hpp
         E9Lang/lang/parser/util.cpp E9Lang/lang/parser/util.hpp
         E9Lang/lang/parser/tokentypes.hpp
+        E9Lang/lang/parser/parser.cpp E9Lang/lang/parser/parser.hpp
         )
-add_library(e9parser SHARED ${PARSER_SOURCE_FILES})
+set(AST_SOURCE_FILES
+        E9Lang/lang/ast/ast.hpp
+        E9Lang/lang/ast/unary.cpp
+        E9Lang/lang/ast/binary.cpp
+        E9Lang/lang/ast/value.cpp
+        E9Lang/lang/ast/var.cpp
+        E9Lang/lang/ast/if.cpp
+        E9Lang/lang/ast/var_def.cpp
+        E9Lang/lang/ast/const_def.cpp
+        E9Lang/lang/ast/print.cpp
+        E9Lang/lang/ast/fun.cpp
+        E9Lang/lang/ast/block.cpp)
+add_library(e9parser SHARED ${PARSER_SOURCE_FILES} ${AST_SOURCE_FILES})
 
-add_executable(lexer_test tests/lexer_test.cpp)
+add_executable(lexer_test tests/lexer_test.cpp tests/tester.hpp)
 target_link_libraries(lexer_test e9parser)

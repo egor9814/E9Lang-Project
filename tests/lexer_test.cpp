@@ -4,11 +4,11 @@
 
 #include <iostream>
 #include "../E9Lang/lang/parser/lexer.hpp"
+#include "tester.hpp"
 
-#define USE_TEST(number) "../tests/test" #number ".enl"
-int main(){
+int lex(const char* filePath){
     using namespace e9lang::parser;
-    FileSourceProvider sourceProvider(USE_TEST(1));
+    FileSourceProvider sourceProvider(filePath);
     if(!sourceProvider.open()){
         std::cerr << "cannot open input file" << std::endl;
         return -1;
@@ -29,6 +29,17 @@ int main(){
             std::cerr << i->toString() << std::endl;
         }
     }
-
     return 0;
+}
+
+CREATE_TEST(test_tokens, test0, {
+    return lex(filePath);
+})
+
+CREATE_TEST(test_script, test1, {
+    return lex(filePath);
+})
+
+int main(){
+    return test_script();
 }

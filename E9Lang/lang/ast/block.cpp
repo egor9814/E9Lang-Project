@@ -1,0 +1,27 @@
+//
+// Created by egor9814 on 16.03.18.
+//
+
+#include "ast.hpp"
+
+void e9lang::ast::BlockStatement::add(Statement *statement) {
+    statements.push_back(statement);
+}
+
+std::string e9lang::ast::BlockStatement::toString() {
+    if (statements.empty())
+        return "{}";
+    std::stringstream ss;
+    ss << '{';
+    /*auto end = statements.end();
+    for(auto i = statements.begin(); i != end; ){
+        ss << std::endl;
+        ss << (*i)->toString();
+    }*/
+    for (auto &i : statements) {
+        ss << std::endl << i->toString();
+    }
+    ss << std::endl << '}';
+    return ss.str();
+}
+
