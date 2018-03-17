@@ -25,3 +25,12 @@ std::string e9lang::ast::BlockStatement::toString() {
     return ss.str();
 }
 
+void e9lang::ast::BlockStatement::finalize() {
+    while(!statements.empty()){
+        auto s = statements.front();
+        statements.pop_front();
+        s->finalize();
+    }
+    delete this;
+}
+

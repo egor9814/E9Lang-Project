@@ -11,7 +11,8 @@ fun main(){
         l = 3L, ul = 4UL
         f = 3.14F, d = 2.7
         b = true,
-        str = "hello!"
+        str = "hello!",
+        nullable = null
 
     print "char: ${c}, unsigned: ${uc}"
     print "short: ${s}, unsigned: ${ui}"
@@ -19,6 +20,7 @@ fun main(){
     print "long: ${l}, unsigned: ${ul}"
     print "float: ${f}, double: ${d}"
     print "bool: ${b}\nstring: ${str}"
+    print "null: ${nullable}"
 
     print variable_not_found
 
@@ -26,7 +28,7 @@ fun main(){
     Pi = 3.1415
 
     var a, b
-    a = 50 b = 2
+    a = -50 b = 2
     print a + b
     print a - b
     print a * b

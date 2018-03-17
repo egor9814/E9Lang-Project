@@ -5,7 +5,6 @@
 #ifndef E9LANG_PROJECT_AST_HPP
 #define E9LANG_PROJECT_AST_HPP
 
-#include <string>
 #include <list>
 #include "../parser/tokens.hpp"
 
@@ -24,6 +23,13 @@ namespace e9lang {
 
 
         class Expression : public Node {
+        public:
+            virtual bool isAccessible() const { return false; }
+        };
+
+        class AccessibleExpression : public Expression {
+        public:
+            bool isAccessible() const override { return true; }
         };
 
         class UnaryExpression : public Expression {
@@ -72,6 +78,33 @@ namespace e9lang {
             void finalize() override;
         };
 
+        class AssignExpression : public Expression {
+            AccessibleExpression* target;
+            Expression* value;
+            Token* operation;
+
+        public:
+            AssignExpression(AccessibleExpression* target, Expression* value, Token* operation);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class FunctionCallExpression : public Expression {
+            Expression* name;
+            std::list<Expression*> args;
+
+        public:
+            explicit FunctionCallExpression(Expression* name);
+
+            void addArgument(Expression* arg);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
 
         class Statement : public Node {
         };
@@ -111,10 +144,10 @@ namespace e9lang {
         };
 
         class PrintStatement : public Statement {
-            Expression* message;
+            Expression *message;
 
         public:
-            explicit PrintStatement(Expression* message);
+            explicit PrintStatement(Expression *message);
 
             std::string toString() override;
 
@@ -122,12 +155,12 @@ namespace e9lang {
         };
 
         class FunStatement : public Statement {
-            Token* name;
-            std::list<Token*> args;
-            Statement* body;
+            Token *name;
+            std::list<Token *> args;
+            Statement *body;
 
         public:
-            FunStatement(Token* functionName, std::list<Token*>& args, Statement* body);
+            FunStatement(Token *functionName, std::list<Token *> &args, Statement *body);
 
             std::string toString() override;
 
@@ -135,14 +168,16 @@ namespace e9lang {
         };
 
         class BlockStatement : public Statement {
-            std::list<e9lang::ast::Statement*> statements;
+            std::list<e9lang::ast::Statement *> statements;
 
         public:
             BlockStatement() = default;
 
-            void add(Statement*);
+            void add(Statement *);
 
             std::string toString() override;
+
+            void finalize() override;
         };
     }
 

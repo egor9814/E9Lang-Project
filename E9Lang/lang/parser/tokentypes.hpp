@@ -2,8 +2,10 @@
 // Created by egor9814 on 15.03.18.
 //
 
-#ifndef PROJECT_TOKENTYPES_HPP
-#define PROJECT_TOKENTYPES_HPP
+#ifndef E9LANG_PROJECT_TOKENTYPES_HPP
+#define E9LANG_PROJECT_TOKENTYPES_HPP
+
+#include <string>
 
 namespace e9lang {
 
@@ -48,6 +50,7 @@ namespace e9lang {
             TokenType_EXCL_EQ, /// !=
             TokenType_HOOK, /// ?
             TokenType_HOOK_EQ, /// ?=
+            TokenType_HOOK_COLON, /// ?:
             TokenType_LT, /// <
             TokenType_LT_EQ, /// <=
             TokenType_GT, /// >
@@ -94,8 +97,9 @@ namespace e9lang {
             TokenType_MULTILINE_COMMENT, /// /*comment*/
         };
 
+        std::string tokenNameOf(TokenType type);
     }
 
 }
 
-#endif //PROJECT_TOKENTYPES_HPP
+#endif //E9LANG_PROJECT_TOKENTYPES_HPP
