@@ -140,15 +140,13 @@ e9lang::ast::Expression *e9lang::parser::Parser::qualifiedName() {
 
 e9lang::ast::Expression *e9lang::parser::Parser::variable() {
     if(lookMatch(0, TokenType_IDENTIFIER) && lookMatch(1, TokenType_LPAREN)){
-        //TODO: implement function call
-        return nullptr;
+        return functionCalls(new ast::ValueExpression(require(TokenType_IDENTIFIER)));
     }
 
     auto var = qualifiedName();
     if(var){
         if(lookMatch(0, TokenType_LPAREN)){
-            //TODO: implement function call
-            return nullptr;
+            return functionCalls(new ast::ValueExpression(require(TokenType_IDENTIFIER)));
         }
         auto current = get();
         if(match(TokenType_PLUS_PLUS)){
@@ -300,13 +298,14 @@ e9lang::ast::Expression *e9lang::parser::Parser::ternary() {
     auto result = logicalOr();
 
     if(match(TokenType_HOOK)){
-        //TODO: implement ternary operator
-        return nullptr;
+        auto trueExpr = expression();
+        require(TokenType_COLON);
+        auto falseExpr = expression();
+        return new ast::TernaryExpression(result, trueExpr, falseExpr);
     }
 
     if(match(TokenType_HOOK_COLON)){
-        //TODO: implement ELVIS operator
-        return nullptr;
+        return new ast::ElvisExpression(result, expression());
     }
 
     return result;
@@ -354,6 +353,17 @@ e9lang::ast::FunctionCallExpression *e9lang::parser::Parser::functionCall(e9lang
     while(!match(TokenType_RPAREN)){
         f->addArgument(expression());
         match(TokenType_COMMA);
+    }
+    return f;
+}
+
+e9lang::ast::FunctionCallExpression *e9lang::parser::Parser::functionCalls(e9lang::ast::Expression *name) {
+    auto f = functionCall(name);
+    if(lookMatch(0, TokenType_LPAREN)){
+        return functionCalls(f);
+    }
+    if(lookMatch(0, TokenType_DOT)){
+        //TODO: implement qualified name
     }
     return f;
 }

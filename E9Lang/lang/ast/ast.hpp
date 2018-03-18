@@ -79,12 +79,12 @@ namespace e9lang {
         };
 
         class AssignExpression : public Expression {
-            AccessibleExpression* target;
-            Expression* value;
-            Token* operation;
+            AccessibleExpression *target;
+            Expression *value;
+            Token *operation;
 
         public:
-            AssignExpression(AccessibleExpression* target, Expression* value, Token* operation);
+            AssignExpression(AccessibleExpression *target, Expression *value, Token *operation);
 
             std::string toString() override;
 
@@ -92,13 +92,43 @@ namespace e9lang {
         };
 
         class FunctionCallExpression : public Expression {
-            Expression* name;
-            std::list<Expression*> args;
+            Expression *name;
+            std::list<Expression *> args;
 
         public:
-            explicit FunctionCallExpression(Expression* name);
+            explicit FunctionCallExpression(Expression *name);
 
-            void addArgument(Expression* arg);
+            void addArgument(Expression *arg);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class TernaryExpression : public Expression {
+            Expression *condition, *trueExpression, *falseExpression;
+        public:
+            TernaryExpression(Expression *condition, Expression *trueExpression, Expression *falseExpression);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class ElvisExpression : public Expression {
+            Expression *condition, *value;
+        public:
+            ElvisExpression(Expression *condition, Expression *value);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class ContainerAccessExpression : public AccessibleExpression {
+            std::list<Expression*> indexes;
+        public:
+            ContainerAccessExpression(std::list<Expression*>& indexes);
 
             std::string toString() override;
 

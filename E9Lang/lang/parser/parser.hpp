@@ -97,7 +97,9 @@ namespace e9lang {
             ast::Expression *assignment();
 
 
-            ast::FunctionCallExpression* functionCall(ast::Expression* name);
+            ast::FunctionCallExpression *functionCall(ast::Expression *name);
+
+            ast::FunctionCallExpression *functionCalls(ast::Expression *name);
         };
     }
 

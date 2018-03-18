@@ -25,7 +25,9 @@ set(AST_SOURCE_FILES
         E9Lang/lang/ast/block.cpp
         E9Lang/lang/ast/assign.cpp
         E9Lang/lang/ast/function_call.cpp
-        )
+        E9Lang/lang/ast/ternary.cpp
+        E9Lang/lang/ast/elvis.cpp
+        E9Lang/lang/ast/container_access.cpp)
 add_library(e9parser SHARED ${PARSER_SOURCE_FILES} ${AST_SOURCE_FILES})
 
 add_executable(lexer_test tests/lexer_test.cpp tests/tester.hpp)
