@@ -120,7 +120,7 @@ e9lang::parser::Lexer::Lexer(e9lang::parser::LexerConfig &config, e9lang::parser
         : cfg(config), source(std::move(sourceProvider.readAll())) {}
 
 e9lang::parser::Lexer::~Lexer() {
-    e9lang::util::deallocate(tokens);
+    e9lang::util::deallocate<std::list<Token*>>(tokens);
 }
 
 
@@ -434,7 +434,7 @@ void e9lang::parser::Lexer::tokenizeChar() {
     if (!error.empty()) {
         this->error(std::move(error), state);
     } else {
-        addToken(TokenType_STRING, state);
+        addToken(TokenType_CHAR, state);
     }
 }
 

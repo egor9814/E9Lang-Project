@@ -6,6 +6,7 @@
 #define E9LANG_PROJECT_PARSER_HPP
 
 #include <set>
+#include <vector>
 #include "../ast/ast.hpp"
 
 namespace e9lang {
@@ -17,7 +18,7 @@ namespace e9lang {
         class Unit : public ast::Node {
             friend class Parser;
 
-            std::list<e9lang::ast::FunStatement *> &functions;
+            std::list<e9lang::ast::FunStatement *> functions;
 
             explicit Unit(std::list<e9lang::ast::FunStatement *> &functions);
 
@@ -29,10 +30,11 @@ namespace e9lang {
 
 
         class Parser {
+        public:
+            typedef std::vector<e9lang::parser::Token *> TokenList;
+        private:
             e9lang::parser::Token *eofToken;
-            typedef std::list<e9lang::parser::Token *> TokenList;
-            TokenList &tokens;
-            TokenList::iterator current, first, last;
+            TokenList tokens;
             unsigned long pos;
 
             std::set<e9lang::parser::TokenType> assignOperators;
@@ -61,6 +63,8 @@ namespace e9lang {
 
 
             ast::Expression *value();
+
+            std::list<ast::Expression *> qualifier();
 
             ast::Expression *qualifiedName();
 
@@ -99,7 +103,44 @@ namespace e9lang {
 
             ast::FunctionCallExpression *functionCall(ast::Expression *name);
 
-            ast::FunctionCallExpression *functionCalls(ast::Expression *name);
+            ast::Expression *functionCalls(ast::Expression *name);
+
+            ast::Arguments *arguments();
+
+            ast::FunStatement *functionDefine();
+
+
+            ast::Statement *statement();
+
+            ast::Statement *statementBlock();
+
+            ast::Statement *statementOrBlock();
+
+            ast::IfStatement *ifStatement();
+
+            void varOrConstDeclaration(std::list<Token *> &names, std::list<ast::Expression *> &values);
+
+            ast::VarStatement *varDeclaration();
+
+            ast::ConstStatement *constDeclaration();
+
+            ast::PrintStatement *print();
+
+            ast::ReturnStatement *returnStatement();
+
+            ast::ForLoop *forLoop();
+
+            ast::WhileLoop *whileLoop();
+
+            ast::WhileLoop *doWhileLoop();
+
+
+        public:
+            Unit *getUnit() const ;
+
+            bool parse();
+
+            TokenList getErrors() const ;
         };
     }
 

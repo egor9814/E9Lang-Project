@@ -31,6 +31,8 @@ namespace e9lang {
             Token(TokenType type, Range range, Location begin, Location end,
                   const std::string &text, const std::string &errorText = "");
 
+            Token(const Token &);
+
             std::string getType();
 
             std::string toString();

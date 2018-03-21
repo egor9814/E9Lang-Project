@@ -188,7 +188,11 @@ std::string e9lang::parser::tokenNameOf(TokenType type) {
 e9lang::parser::Token::Token(TokenType type, Range range, Location begin, Location end, const std::string &text,
                              const std::string &errorText)
         : type(type), range(range), begin(begin), end(end),
-          text(std::move(text)), errorText(std::move(errorText)) {}
+          text(text), errorText(errorText) {}
+
+e9lang::parser::Token::Token(const e9lang::parser::Token &t)
+        : type(t.type), range(t.range), begin(t.begin), end(t.end),
+          text(t.text), errorText(t.errorText) {}
 
 std::string e9lang::parser::Token::getType() {
     return tokenNameOf(type);
@@ -247,5 +251,6 @@ std::string e9lang::parser::Token::toString() {
     if (type == TokenType_STRING)
         ss << '"';
     ss << '"';
-    return ss.str();
+    auto s = ss.str();
+    return s;
 }

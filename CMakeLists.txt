@@ -27,8 +27,20 @@ set(AST_SOURCE_FILES
         E9Lang/lang/ast/function_call.cpp
         E9Lang/lang/ast/ternary.cpp
         E9Lang/lang/ast/elvis.cpp
-        E9Lang/lang/ast/container_access.cpp)
+        E9Lang/lang/ast/container_access.cpp
+        E9Lang/lang/ast/argument.cpp
+        E9Lang/lang/ast/arguments.cpp
+        E9Lang/lang/ast/return.cpp
+        E9Lang/lang/ast/loop_ctrl.cpp
+        E9Lang/lang/ast/while.cpp
+        E9Lang/lang/ast/for.cpp
+        E9Lang/lang/ast/empty.cpp
+        E9Lang/lang/ast/expr.cpp
+        )
 add_library(e9parser SHARED ${PARSER_SOURCE_FILES} ${AST_SOURCE_FILES})
 
 add_executable(lexer_test tests/lexer_test.cpp tests/tester.hpp)
 target_link_libraries(lexer_test e9parser)
+
+add_executable(parser_test tests/parser_test.cpp tests/tester.hpp)
+target_link_libraries(parser_test e9parser)

@@ -7,6 +7,17 @@
 e9lang::ast::ContainerAccessExpression::ContainerAccessExpression(std::list<Expression *> &indexes)
         : indexes(indexes) {}
 
+e9lang::ast::ContainerAccessExpression::ContainerAccessExpression(e9lang::ast::Expression *target,
+                                                                  std::list<Expression *> &indexes)
+        : indexes(indexes){
+    this->indexes.push_front(target);
+}
+
+e9lang::ast::ContainerAccessExpression::ContainerAccessExpression(e9lang::ast::Expression *target)
+        : indexes() {
+    indexes.push_front(target);
+}
+
 std::string e9lang::ast::ContainerAccessExpression::toString() {
     auto it = indexes.begin();
     auto end = indexes.end();

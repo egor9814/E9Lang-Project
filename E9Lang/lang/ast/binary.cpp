@@ -8,7 +8,7 @@ e9lang::ast::BinaryExpression::BinaryExpression(Expression *left, Expression *ri
         : left(left), right(right), operation(operation) {}
 
 std::string e9lang::ast::BinaryExpression::toString() {
-    return '(' + left->toString() + operation->text + right->toString() + ')';
+    return '(' + left->toString() + " " + operation->text + " " + right->toString() + ')';
 }
 
 void e9lang::ast::BinaryExpression::finalize() {

@@ -11,19 +11,32 @@ namespace e9lang {
 
     namespace util {
 
-        template<typename T>
-        void deallocate(std::list<T *> &list);
+        template<class Container>
+        void deallocate(Container &list);
 
+
+        template<class Container>
+        void finalize(Container &list);
     }
 
 }
 
-template<typename T>
-void ::e9lang::util::deallocate(std::list<T *> &list) {
+template<class Container>
+void ::e9lang::util::deallocate(Container &list) {
     while (!list.empty()) {
-        auto pointer = list.front();
-        list.pop_front();
+        auto pointer = list.back();
+        list.pop_back();
         delete pointer;
+    }
+}
+
+
+template<class Container>
+void ::e9lang::util::finalize(Container &list) {
+    while (!list.empty()) {
+        auto pointer = list.back();
+        list.pop_back();
+        pointer->finalize();
     }
 }
 

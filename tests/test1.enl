@@ -1,15 +1,15 @@
 
 fun main(){
-    if true and true
+    if (true and true)
         print "it's work!"
     else
         print "something wrong!"
 
     var c = '0', uc = 250UC,
         s = 65000S, us = 65000US,
-        i = 32000000, ui = 32000000
-        l = 3L, ul = 4UL
-        f = 3.14F, d = 2.7
+        i = 32000000, ui = 32000000,
+        l = 3L, ul = 4UL,
+        f = 3.14F, d = 2.7,
         b = true,
         str = "hello!",
         nullable = null

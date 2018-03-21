@@ -8,7 +8,7 @@ e9lang::ast::AssignExpression::AssignExpression(AccessibleExpression *target, Ex
         : target(target), value(value), operation(operation) {}
 
 std::string e9lang::ast::AssignExpression::toString() {
-    return target->toString() + operation->getType() + value->toString();
+    return target->toString() + " " + operation->text + " " + value->toString();
 }
 
 void e9lang::ast::AssignExpression::finalize() {

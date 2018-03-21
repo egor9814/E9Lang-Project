@@ -67,7 +67,7 @@ namespace e9lang {
             void finalize() override;
         };
 
-        class VarExpression : public Expression {
+        class VarExpression : public AccessibleExpression {
             std::string &name;
 
         public:
@@ -126,9 +126,43 @@ namespace e9lang {
         };
 
         class ContainerAccessExpression : public AccessibleExpression {
-            std::list<Expression*> indexes;
+            std::list<Expression *> indexes;
         public:
-            ContainerAccessExpression(std::list<Expression*>& indexes);
+            explicit ContainerAccessExpression(std::list<Expression *> &indexes);
+
+            ContainerAccessExpression(Expression *target, std::list<Expression *> &indexes);
+
+            explicit ContainerAccessExpression(Expression *target);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+
+        class Argument : public Node {
+            std::string name;
+            bool var_arg;
+        public:
+            Argument(Token *name, bool var_arg);
+
+            std::string &getName();
+
+            bool isVarArg() const;
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class Arguments : public Node {
+            std::list<Argument *> args{};
+        public:
+            Arguments() = default;
+
+            void add(Argument *arg);
+
+            bool hasVarArgs();
 
             std::string toString() override;
 
@@ -152,10 +186,11 @@ namespace e9lang {
         };
 
         class VarStatement : public Statement {
-            std::list<Token *> names, values;
+            std::list<Token *> names;
+            std::list<Expression *> values;
 
         public:
-            VarStatement(std::list<Token *> &names, std::list<Token *> &values);
+            VarStatement(std::list<Token *> &names, std::list<Expression *> &values);
 
             std::string toString() override;
 
@@ -163,10 +198,11 @@ namespace e9lang {
         };
 
         class ConstStatement : public Statement {
-            std::list<Token *> names, values;
+            std::list<Token *> names;
+            std::list<Expression *> values;
 
         public:
-            ConstStatement(std::list<Token *> &names, std::list<Token *> &values);
+            ConstStatement(std::list<Token *> &names, std::list<Expression *> &values);
 
             std::string toString() override;
 
@@ -186,11 +222,11 @@ namespace e9lang {
 
         class FunStatement : public Statement {
             Token *name;
-            std::list<Token *> args;
+            Arguments *args;
             Statement *body;
 
         public:
-            FunStatement(Token *functionName, std::list<Token *> &args, Statement *body);
+            FunStatement(Token *functionName, Arguments *args, Statement *body);
 
             std::string toString() override;
 
@@ -198,12 +234,79 @@ namespace e9lang {
         };
 
         class BlockStatement : public Statement {
-            std::list<e9lang::ast::Statement *> statements;
+            std::list<e9lang::ast::Statement *> statements{};
 
         public:
             BlockStatement() = default;
 
             void add(Statement *);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class ReturnStatement : public Statement {
+            Expression *value;
+        public:
+            explicit ReturnStatement(Expression *value);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class LoopControlStatement : public Statement {
+            Token *type;
+
+        public:
+            explicit LoopControlStatement(Token *type);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class WhileLoop : public Statement {
+            bool postCondition;
+            Expression *condition;
+            Statement *body;
+
+        public:
+            WhileLoop(bool postCondition, Expression *condition, Statement *body);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class ForLoop : public Statement {
+            Statement *init;
+            Expression *condition;
+            Statement *update;
+            Statement *body;
+
+        public:
+            ForLoop(Statement *init, Expression *condition, Statement *update, Statement *body);
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class EmptyStatement : public Statement {
+        public:
+            EmptyStatement();
+
+            std::string toString() override;
+
+            void finalize() override;
+        };
+
+        class ExpressionStatement : public Statement {
+            Expression *expression;
+        public:
+            explicit ExpressionStatement(Expression *expression);
 
             std::string toString() override;
 
