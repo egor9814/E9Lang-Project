@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "../E9Lang/lang/parser/lexer.hpp"
+#include "e9lang/lexer.hpp"
 #include "tester.hpp"
 
 int lex(const char* filePath){

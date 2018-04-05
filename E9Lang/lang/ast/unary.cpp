@@ -2,7 +2,7 @@
 // Created by egor9814 on 15.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::UnaryExpression::UnaryExpression(Expression *target, Token *operation)
         : target(target), operation(operation) {}
@@ -18,5 +18,9 @@ std::string e9lang::ast::UnaryExpression::toString() {
 void e9lang::ast::UnaryExpression::finalize() {
     target->finalize();
     delete this;
+}
+
+void e9lang::ast::UnaryExpression::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }
 

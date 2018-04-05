@@ -2,30 +2,8 @@
 // Created by egor9814 on 15.03.18.
 //
 
-#include "parser.hpp"
+#include "e9lang/parser.hpp"
 #include "util.hpp"
-
-e9lang::parser::Unit::Unit(std::list<e9lang::ast::FunStatement *> &functions)
-        : functions(functions) {}
-
-std::string e9lang::parser::Unit::toString() {
-    std::stringstream ss;
-    for (auto &i : functions) {
-        ss << "\n";
-        ss << i->toString();
-    }
-    return ss.str();
-}
-
-void e9lang::parser::Unit::finalize() {
-    while (!functions.empty()) {
-        auto f = functions.front();
-        functions.pop_front();
-        f->finalize();
-    }
-    delete this;
-}
-
 
 class ParseError {
 };
@@ -46,6 +24,7 @@ e9lang::parser::Parser::Parser(std::list<e9lang::parser::Token *> &tokens) {
     }
 
     eofToken = new Token(TokenType_EOF, {0, 0}, {0, 0}, {0, 0}, "End of file");
+    nullToken = new Token(TokenType_NULL, {0, 0}, {0, 0}, {0, 0}, "null");
 
     assignOperators.emplace(TokenType_EQ);
     assignOperators.emplace(TokenType_HOOK_EQ);
@@ -67,6 +46,7 @@ e9lang::parser::Parser::Parser(std::list<e9lang::parser::Token *> &tokens) {
 e9lang::parser::Parser::~Parser() {
     e9lang::util::deallocate(errors);
     delete eofToken;
+    delete nullToken;
     if(parsedUnit)
         parsedUnit->finalize();
 }
@@ -121,6 +101,12 @@ bool e9lang::parser::Parser::lookMatch(unsigned long relPos, e9lang::parser::Tok
 
 
 e9lang::ast::Expression *e9lang::parser::Parser::value() {
+    if(match(TokenType_LBRACE))
+        return map();
+
+    if(match(TokenType_LBRACKET))
+        return array();
+
     auto current = get();
     switch (current->type) {
         default:
@@ -145,8 +131,8 @@ e9lang::ast::Expression *e9lang::parser::Parser::value() {
     }
 }
 
-std::list<e9lang::ast::Expression *> e9lang::parser::Parser::qualifier() {
-    std::list<ast::Expression *> indexes;
+std::vector<e9lang::ast::Expression *> e9lang::parser::Parser::qualifier() {
+    std::vector<ast::Expression *> indexes;
     if (lookMatch(0, TokenType_DOT) || lookMatch(0, TokenType_LBRACKET)) {
         while (lookMatch(0, TokenType_DOT) || lookMatch(0, TokenType_LBRACKET)) {
             if (match(TokenType_DOT)) {
@@ -168,7 +154,7 @@ e9lang::ast::Expression *e9lang::parser::Parser::qualifiedName() {
     auto indexes = qualifier();
     if (indexes.empty())
         return new ast::VarExpression(current);
-    return new ast::ContainerAccessExpression(indexes);
+    return new ast::ContainerAccessExpression(new ast::VarExpression(current), indexes);
 }
 
 e9lang::ast::Expression *e9lang::parser::Parser::variable() {
@@ -179,7 +165,7 @@ e9lang::ast::Expression *e9lang::parser::Parser::variable() {
     auto var = qualifiedName();
     if (var) {
         if (lookMatch(0, TokenType_LPAREN)) {
-            return functionCalls(new ast::ValueExpression(require(TokenType_IDENTIFIER)));
+            return functionCalls(var);
         }
         auto current = get();
         if (match(TokenType_PLUS_PLUS)) {
@@ -202,8 +188,7 @@ e9lang::ast::Expression *e9lang::parser::Parser::primary() {
     }
 
     if (match(TokenType_FUN)) {
-        //TODO: implement lambda-function definition
-        return nullptr;
+        return functionDefine(nullptr);
     }
 
     return variable();
@@ -358,11 +343,14 @@ e9lang::ast::Expression *e9lang::parser::Parser::assignmentStrict() {
     auto save_pos = pos;
     auto target = qualifiedName();
     if (!target || !target->isAccessible()) {
+        if(target)
+            target->finalize();
         return recover(save_pos);
     }
 
     auto current = get();
     if (assignOperators.count(current->type) == 0) {
+        target->finalize();
         return recover(save_pos);
     }
     match(current->type);
@@ -380,6 +368,7 @@ e9lang::ast::Expression *e9lang::parser::Parser::assignment() {
 e9lang::ast::Expression *e9lang::parser::Parser::expression() {
     return assignment();
 }
+
 
 e9lang::ast::FunctionCallExpression *e9lang::parser::Parser::functionCall(e9lang::ast::Expression *name) {
     require(TokenType_LPAREN);
@@ -410,24 +399,35 @@ e9lang::ast::Expression *e9lang::parser::Parser::functionCalls(e9lang::ast::Expr
 
 e9lang::ast::Arguments *e9lang::parser::Parser::arguments() {
     auto args = new ast::Arguments;
-    require(TokenType_LPAREN);
-    while (!match(TokenType_RPAREN)) {
-        auto name = require(TokenType_IDENTIFIER);
-        bool var_arg = false;
-        if (match(TokenType_LBRACKET)) {
-            require(TokenType_RBRACKET);
-            var_arg = true;
+    std::string error;
+    auto start = get();
+    if(match(TokenType_LPAREN))
+        while (!match(TokenType_RPAREN)) {
+            auto name = require(TokenType_IDENTIFIER);
+            bool var_arg = false;
+            if (match(TokenType_LBRACKET)) {
+                require(TokenType_RBRACKET);
+                var_arg = true;
+            }
+            if(args->hasVarArgs())
+                error = "cannot add argument after vararg";
+            if(error.empty())
+                args->add(new ast::Argument(name, var_arg));
+            match(TokenType_COMMA);
         }
-        args->add(new ast::Argument(name, var_arg));
-        match(TokenType_COMMA);
+    if(!error.empty()){
+        args->finalize();
+        this->error(error, start, get());
     }
     return args;
 }
 
-e9lang::ast::FunStatement *e9lang::parser::Parser::functionDefine() {
-    auto start = get();
-    auto name = require(TokenType_IDENTIFIER);
-    auto args = arguments();
+e9lang::ast::FunStatement *e9lang::parser::Parser::functionDefine(e9lang::parser::Token *name) {
+    auto start = get(0);
+    ast::Arguments* args = nullptr;
+    try {
+        args = arguments();
+    } catch (ParseError&){}
     ast::Statement *body = nullptr;
     if (match(TokenType_EQ)) {
         body = new ast::ReturnStatement(expression());
@@ -435,9 +435,20 @@ e9lang::ast::FunStatement *e9lang::parser::Parser::functionDefine() {
         body = statementBlock();
     } else {
         auto current = get();
+        if(args)
+            args->finalize();
         error("unknown function define type: " + current->text, start, current);
     }
+    if(!args){
+        if(body)
+            body->finalize();
+        error("invalid function definition", start, get());
+    }
     return new ast::FunStatement(name, args, body);
+}
+
+e9lang::ast::FunStatement *e9lang::parser::Parser::functionDefine() {
+    return functionDefine(require(TokenType_IDENTIFIER));
 }
 
 
@@ -472,7 +483,7 @@ void e9lang::parser::Parser::varOrConstDeclaration(std::list<Token *> &names, st
         if (match(TokenType_EQ)) {
             values.push_back(expression());
         } else {
-            values.push_back(nullptr);
+            values.push_back(new ast::ValueExpression(nullToken));
         }
     } while (match(TokenType_COMMA));
 }
@@ -503,8 +514,10 @@ e9lang::ast::ForLoop *e9lang::parser::Parser::forLoop() {
     require(TokenType_LPAREN);
     ast::Statement *init, *update, *body;
     ast::Expression *condition;
-    init = match(TokenType_SEMICOLON) ? nullptr : statementOrBlock();
-    condition = match(TokenType_SEMICOLON) ? nullptr : expression();
+    init = lookMatch(0, TokenType_SEMICOLON) ? nullptr : statementOrBlock();
+    require(TokenType_SEMICOLON);
+    condition = lookMatch(0, TokenType_SEMICOLON) ? nullptr : expression();
+    require(TokenType_SEMICOLON);
     update = lookMatch(0, TokenType_RPAREN) ? nullptr : statementOrBlock();
     require(TokenType_RPAREN);
     body = statementOrBlock();
@@ -562,9 +575,9 @@ e9lang::ast::Statement *e9lang::parser::Parser::statement() {
         if(match(TokenType_BREAK) || match(TokenType_CONTINUE))
             return new ast::LoopControlStatement(current);
 
-        auto assign = assignmentStrict();
-        if(assign)
-            return new ast::ExpressionStatement(assign);
+        auto expr = expression();
+        if(expr)
+            return new ast::ExpressionStatement(expr);
 
         error("unknown statement: " + current->text, current, current);
     } catch (ParseError& err){
@@ -579,7 +592,7 @@ e9lang::ast::Statement *e9lang::parser::Parser::statement() {
 }
 
 
-e9lang::parser::Unit *e9lang::parser::Parser::getUnit() const {
+e9lang::ast::Unit *e9lang::parser::Parser::getUnit() const {
     return parsedUnit;
 }
 
@@ -601,11 +614,35 @@ bool e9lang::parser::Parser::parse() {
             }
         }
     }
-    parsedUnit = new Unit(functions);
+    parsedUnit = new ast::Unit(functions);
 
     return errors.empty();
 }
 
 e9lang::parser::Parser::TokenList e9lang::parser::Parser::getErrors() const {
     return errors;
+}
+
+
+e9lang::ast::Expression *e9lang::parser::Parser::array() {
+    std::list<ast::Expression*> values;
+    while(!match(TokenType_RBRACKET)){
+        values.push_back(expression());
+        match(TokenType_COMMA);
+    }
+    return new ast::ArrayExpression(values);
+}
+
+e9lang::ast::Expression *e9lang::parser::Parser::map() {
+    std::list<ast::Expression*> keys, values;
+    while(!match(TokenType_RBRACE)){
+        keys.push_back(expression());
+        if(match(TokenType_EQ)){
+            values.push_back(expression());
+        } else {
+            values.push_back(new ast::ValueExpression(nullToken));
+        }
+        match(TokenType_COMMA);
+    }
+    return new ast::MapExpression(keys, values);
 }

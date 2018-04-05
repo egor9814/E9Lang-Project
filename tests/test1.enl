@@ -1,4 +1,6 @@
 
+fun sum(a, b) = a + b
+
 fun main(){
     if (true and true)
         print "it's work!"
@@ -29,7 +31,7 @@ fun main(){
 
     var a, b
     a = -50 b = 2
-    print a + b
+    print sum(a, b)
     print a - b
     print a * b
     print a / b

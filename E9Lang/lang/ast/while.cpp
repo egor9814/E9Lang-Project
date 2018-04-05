@@ -2,7 +2,7 @@
 // Created by egor9814 on 21.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::WhileLoop::WhileLoop(bool postCondition, Expression *condition, Statement *body)
         : postCondition(postCondition), condition(condition), body(body) {}
@@ -21,4 +21,8 @@ void e9lang::ast::WhileLoop::finalize() {
     condition->finalize();
     body->finalize();
     delete this;
+}
+
+void e9lang::ast::WhileLoop::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

@@ -7,39 +7,23 @@
 
 #include <set>
 #include <vector>
-#include "../ast/ast.hpp"
+#include "ast.hpp"
 
 namespace e9lang {
 
     namespace parser {
 
-        class Parser;
-
-        class Unit : public ast::Node {
-            friend class Parser;
-
-            std::list<e9lang::ast::FunStatement *> functions;
-
-            explicit Unit(std::list<e9lang::ast::FunStatement *> &functions);
-
-        public:
-            std::string toString() override;
-
-            void finalize() override;
-        };
-
-
         class Parser {
         public:
             typedef std::vector<e9lang::parser::Token *> TokenList;
         private:
-            e9lang::parser::Token *eofToken;
+            e9lang::parser::Token *eofToken, *nullToken;
             TokenList tokens;
             unsigned long pos;
 
             std::set<e9lang::parser::TokenType> assignOperators;
 
-            Unit *parsedUnit = nullptr;
+            ast::Unit *parsedUnit = nullptr;
             TokenList errors;
 
             void error(std::string text, Token *begin, Token *end);
@@ -64,7 +48,7 @@ namespace e9lang {
 
             ast::Expression *value();
 
-            std::list<ast::Expression *> qualifier();
+            std::vector<ast::Expression *> qualifier();
 
             ast::Expression *qualifiedName();
 
@@ -107,6 +91,8 @@ namespace e9lang {
 
             ast::Arguments *arguments();
 
+            ast::FunStatement *functionDefine(Token* name);
+
             ast::FunStatement *functionDefine();
 
 
@@ -135,12 +121,17 @@ namespace e9lang {
             ast::WhileLoop *doWhileLoop();
 
 
+            ast::Expression *array();
+
+            ast::Expression *map();
+
+
         public:
-            Unit *getUnit() const ;
+            ast::Unit *getUnit() const;
 
             bool parse();
 
-            TokenList getErrors() const ;
+            TokenList getErrors() const;
         };
     }
 

@@ -5,7 +5,7 @@
 #ifndef E9LANG_PROJECT_LEXER_HPP
 #define E9LANG_PROJECT_LEXER_HPP
 
-#include "tokens.hpp"
+#include "e9lang/tokens.hpp"
 #include <map>
 #include <list>
 #include <fstream>

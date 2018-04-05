@@ -3,12 +3,12 @@
 //
 
 #include <iostream>
-#include "../E9Lang/lang/parser/lexer.hpp"
-#include "../E9Lang/lang/parser/parser.hpp"
+#include "e9lang/lexer.hpp"
+#include "e9lang/parser.hpp"
 
-int Test1(){
+int TestCompile(){
     using namespace e9lang::parser;
-    FileSourceProvider sourceProvider("../tests/test1.enl");
+    FileSourceProvider sourceProvider("../tests/test2.enl");
     if(!sourceProvider.open()){
         std::cerr << "cannot open input file" << std::endl;
         return -1;
@@ -44,5 +44,5 @@ int Test1(){
 }
 
 int main(){
-    return Test1();
+    return TestCompile();
 }

@@ -2,7 +2,7 @@
 // Created by egor9814 on 17.03.18.
 //
 
-#include "tokens.hpp"
+#include "e9lang/tokens.hpp"
 
 std::string e9lang::parser::tokenNameOf(TokenType type) {
     switch (type) {

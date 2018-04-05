@@ -2,7 +2,7 @@
 // Created by egor9814 on 19.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::Argument::Argument(Token *name, bool var_arg)
         : name(name->text), var_arg(var_arg) {}
@@ -25,4 +25,8 @@ std::string e9lang::ast::Argument::toString() {
 
 void e9lang::ast::Argument::finalize() {
     delete this;
+}
+
+void e9lang::ast::Argument::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

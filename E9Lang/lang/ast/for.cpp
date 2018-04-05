@@ -2,7 +2,7 @@
 // Created by egor9814 on 21.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::ForLoop::ForLoop(Statement *init, Expression *condition, Statement *update, Statement *body)
         : init(init), condition(condition), update(update), body(body) {}
@@ -31,4 +31,8 @@ void e9lang::ast::ForLoop::finalize() {
         update->finalize();
     body->finalize();
     delete this;
+}
+
+void e9lang::ast::ForLoop::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

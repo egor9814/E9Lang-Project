@@ -2,7 +2,7 @@
 // Created by egor9814 on 18.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::TernaryExpression::TernaryExpression(Expression *condition, Expression *trueExpression,
                                                   Expression *falseExpression)
@@ -17,4 +17,8 @@ void e9lang::ast::TernaryExpression::finalize() {
     trueExpression->finalize();
     falseExpression->finalize();
     delete this;
+}
+
+void e9lang::ast::TernaryExpression::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

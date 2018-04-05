@@ -2,7 +2,7 @@
 // Created by egor9814 on 15.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::VarStatement::VarStatement(std::list<Token *> &names, std::list<Expression *> &values)
         : names(std::move(names)), values(std::move(values)) {}
@@ -32,4 +32,8 @@ void e9lang::ast::VarStatement::finalize() {
             v->finalize();
     }
     delete this;
+}
+
+void e9lang::ast::VarStatement::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

@@ -2,7 +2,7 @@
 // Created by egor9814 on 16.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 void e9lang::ast::BlockStatement::add(Statement *statement) {
     statements.push_back(statement);
@@ -32,5 +32,9 @@ void e9lang::ast::BlockStatement::finalize() {
         s->finalize();
     }
     delete this;
+}
+
+void e9lang::ast::BlockStatement::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }
 

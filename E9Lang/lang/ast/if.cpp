@@ -2,7 +2,7 @@
 // Created by egor9814 on 15.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 e9lang::ast::IfStatement::IfStatement(Expression *condition, Statement *thenStatement, Statement *elseStatement)
         : condition(condition), thenStatement(thenStatement), elseStatement(elseStatement) {}
@@ -22,4 +22,8 @@ void e9lang::ast::IfStatement::finalize() {
     if (elseStatement)
         elseStatement->finalize();
     delete this;
+}
+
+void e9lang::ast::IfStatement::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

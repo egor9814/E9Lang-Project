@@ -1,0 +1,36 @@
+
+fun max(value, values[]) {
+	var max = value
+	if(values.length != 0)
+		for(var i = 0; i < values.length; i++){
+			if(values[i] > max)
+				max = values[i]
+		}
+	return max
+}
+
+fun fact(n) {
+	if(n <= 1)
+		return 1
+	else
+		return n * fact(n-1)
+}
+
+fun fact2(n) = n <= 1 ? 1 : n * fact(n-1)
+
+fun fact3(n) = (n ** n) * (2.7 ** n) * ((2 * 3.14 * n) ** 0.5) * (2.7 ** (1/(2*n) - 0.00001))
+
+fun MyObject() = {
+	"f" = fun { print "my function" }
+	"rad" = fun (deg) = 3.14 / 180 * deg
+}
+
+fun main(args[]){
+	print args
+	print max(1, 2, 3, 4, 0)
+	print fact(5)
+	var obj = MyObject()
+	obj.f()
+	print obj["rad"](360)
+	return -1
+}

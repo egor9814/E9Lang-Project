@@ -2,7 +2,7 @@
 // Created by egor9814 on 19.03.18.
 //
 
-#include "ast.hpp"
+#include "../../include/e9lang/ast.hpp"
 
 void e9lang::ast::Arguments::add(Argument *arg) {
     args.push_back(arg);
@@ -15,8 +15,12 @@ bool e9lang::ast::Arguments::hasVarArgs() {
 std::string e9lang::ast::Arguments::toString() {
     std::stringstream ss;
     ss << "(";
-    for(auto &i : args){
-        ss << i->toString() << ", ";
+    auto end = args.end();
+    for(auto i = args.begin(); i != end; ){
+        ss << (*i)->toString();
+        i++;
+        if(i != end)
+            ss << ", ";
     }
     ss << ")";
     return ss.str();
@@ -29,4 +33,8 @@ void e9lang::ast::Arguments::finalize() {
         a->finalize();
     }
     delete this;
+}
+
+void e9lang::ast::Arguments::accept(e9lang::ast::Visitor *visitor) {
+    visitor->visit(this);
 }

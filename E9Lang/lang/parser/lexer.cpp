@@ -2,7 +2,7 @@
 // Created by egor9814 on 13.03.18.
 //
 
-#include "lexer.hpp"
+#include "e9lang/lexer.hpp"
 #include "util.hpp"
 
 e9lang::parser::LexerConfig::LexerConfig(int tabWidth, bool skipComments)
